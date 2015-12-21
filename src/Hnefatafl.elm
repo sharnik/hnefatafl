@@ -4,7 +4,9 @@ import StartApp
 import Task exposing (Task)
 import Signal exposing (Signal, Address)
 import Effects exposing (Effects, Never)
-import Html exposing (Html)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import List exposing (map)
 
 -- Boilerplate
 
@@ -33,7 +35,8 @@ type Action = NoOp
 -- Functions
 
 init : (Model, Effects Action)
-init = ("Hello World", Effects.none)
+init =
+  ("Hello World", Effects.none)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -41,4 +44,16 @@ update action model =
     NoOp -> (model, Effects.none)
 
 view : Address Action -> Model -> Html
-view address model = Html.text model
+view address model = drawBoard
+
+drawBoard : Html
+drawBoard =
+  div [ id "board" ] (List.map (drawRow) [1..11])
+
+drawField : Int -> Html
+drawField number =
+  td [] [ text (toString number)]
+
+drawRow : Int -> Html
+drawRow _ =
+  tr [] (List.map (drawField) [1..11])
