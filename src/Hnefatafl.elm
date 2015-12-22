@@ -32,19 +32,34 @@ port tasks =
 -- Type declarations
 
 type Action = NoOp
-type Field = Empty | Pawn | King
+type Field = Empty | WhitePawn | BlackPawn | King | Forbidden
 type alias FieldRow = Array Field
 type alias Board = Array FieldRow
 type alias Model = {board: Board}
 
 
 -- Functions
+
 boardSize : Int
 boardSize = 11
 
 initialModel : Model
 initialModel =
-  {board = Array.repeat boardSize (Array.repeat boardSize Empty)}
+  { board =
+     Array.fromList
+       [ Array.fromList [ Forbidden, Empty, Empty, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, Empty, Empty, Forbidden ]
+       , Array.fromList [ Empty, Empty, Empty, Empty, Empty, WhitePawn, Empty, Empty, Empty, Empty, Empty ]
+       , Array.repeat boardSize Empty
+       , Array.fromList [ WhitePawn, Empty, Empty, Empty, Empty, BlackPawn, Empty, Empty, Empty, Empty, WhitePawn ]
+       , Array.fromList [ WhitePawn, Empty, Empty, Empty, BlackPawn, BlackPawn, BlackPawn, Empty, Empty, Empty, WhitePawn ]
+       , Array.fromList [ WhitePawn, WhitePawn, Empty, BlackPawn, BlackPawn, King, BlackPawn, BlackPawn, Empty, WhitePawn, WhitePawn ]
+       , Array.fromList [ WhitePawn, Empty, Empty, Empty, BlackPawn, BlackPawn, BlackPawn, Empty, Empty, Empty, WhitePawn ]
+       , Array.fromList [ WhitePawn, Empty, Empty, Empty, Empty, BlackPawn, Empty, Empty, Empty, Empty, WhitePawn ]
+       , Array.repeat boardSize Empty
+       , Array.fromList [ Empty, Empty, Empty, Empty, Empty, WhitePawn, Empty, Empty, Empty, Empty, Empty ]
+       , Array.fromList [ Forbidden, Empty, Empty, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, Empty, Empty, Forbidden ]
+       ]
+  }
 
 init : (Model, Effects Action)
 init =
@@ -67,10 +82,12 @@ drawField field =
   let
     fieldText = case field of
       Empty -> ""
-      Pawn -> "♟"
+      WhitePawn -> "♙"
+      BlackPawn -> "♟"
       King -> "♔"
+      Forbidden -> "X"
   in
-    td [] [ text fieldText ]
+    td [] [ a [] [ text fieldText ] ]
 
 
 drawRow : FieldRow -> Html
