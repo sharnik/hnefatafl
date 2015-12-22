@@ -7,6 +7,7 @@ import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List exposing (map)
+import Array exposing (Array)
 
 -- Boilerplate
 
@@ -27,16 +28,27 @@ port tasks : Signal (Task Never ())
 port tasks =
   app.tasks
 
+
 -- Type declarations
 
-type alias Model = String
 type Action = NoOp
+type Field = Empty | Pawn | King
+type alias FieldRow = Array Field
+type alias Board = Array FieldRow
+type alias Model = {board: Board}
+
 
 -- Functions
+boardSize : Int
+boardSize = 11
+
+initialModel : Model
+initialModel =
+  {board = Array.repeat boardSize (Array.repeat boardSize Empty)}
 
 init : (Model, Effects Action)
 init =
-  ("Hello World", Effects.none)
+  (initialModel, Effects.none)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -44,16 +56,23 @@ update action model =
     NoOp -> (model, Effects.none)
 
 view : Address Action -> Model -> Html
-view address model = drawBoard
+view address model = drawBoard model.board
 
-drawBoard : Html
-drawBoard =
-  div [ id "board" ] (List.map (drawRow) [1..11])
+drawBoard : Board -> Html
+drawBoard board =
+  div [ id "board" ] (List.map (drawRow) (Array.toList board))
 
-drawField : Int -> Html
-drawField number =
-  td [] [ text ""]
+drawField : Field -> Html
+drawField field =
+  let
+    fieldText = case field of
+      Empty -> ""
+      Pawn -> "♟"
+      King -> "♔"
+  in
+    td [] [ text fieldText ]
 
-drawRow : Int -> Html
-drawRow _ =
-  tr [] (List.map (drawField) [1..11])
+
+drawRow : FieldRow -> Html
+drawRow row =
+  tr [] (List.map (drawField) (Array.toList row))
