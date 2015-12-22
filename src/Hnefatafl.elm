@@ -52,7 +52,7 @@ drawBoard =
 
 drawField : Int -> Html
 drawField number =
-  td [] [ text (toString number)]
+  td [] [ text ""]
 
 drawRow : Int -> Html
 drawRow _ =
