@@ -28,7 +28,15 @@ update action model =
     NoOp ->
       model
     Select ->
-      { model | state = Selected }
+      case model.content of
+        WhitePawn ->
+          { model | state = Selected }
+        BlackPawn ->
+          { model | state = Selected }
+        King ->
+          { model | state = Selected }
+        _ ->
+          model
 
 
 -- View
