@@ -20,7 +20,7 @@ init content =
 
 -- Update
 
-type Action = NoOp | Select
+type Action = NoOp | Select | Deselect
 
 update : Action -> Model -> Model
 update action model =
@@ -28,13 +28,23 @@ update action model =
     NoOp ->
       model
     Select ->
-      case model.content of
+    case model.content of
         WhitePawn ->
           { model | state = Selected }
         BlackPawn ->
           { model | state = Selected }
         King ->
           { model | state = Selected }
+        _ ->
+          model
+    Deselect ->
+      case model.content of
+        WhitePawn ->
+          { model | state = Normal }
+        BlackPawn ->
+          { model | state = Normal }
+        King ->
+          { model | state = Normal }
         _ ->
           model
 
@@ -61,10 +71,12 @@ view address model =
     fieldStyle = case model.state of
       Normal -> normalStyle
       Selected -> selectedStyle
-      
+    clickAction = case model.state of
+      Normal -> Select
+      Selected -> Deselect
   in
     td
       [ fieldStyle
-      , onClick address Select
+      , onClick address clickAction
       ]
       [ a [] [ text fieldText ] ]

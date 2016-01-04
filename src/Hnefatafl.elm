@@ -189,7 +189,7 @@ update action model =
     Modify id fieldAction ->
       let updateField (fieldID, fieldModel) =
         if fieldID == id then
-          (fieldID, Field.update Field.Select fieldModel)
+          (fieldID, Field.update fieldAction fieldModel)
         else
           (fieldID, fieldModel)
       in 
@@ -205,7 +205,7 @@ view address model = drawBoard address model.board
 
 drawBoard : Address Action -> Board -> Html
 drawBoard address board =
-  div [ id "board" ] (List.map (drawRow address board) [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ])
+  div [ id "board" ] (List.map (drawRow address board) [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ])
 
 drawRow : Address Action -> Board -> Int -> Html
 drawRow address board count =
