@@ -51,14 +51,6 @@ update action model =
 
 -- View
 
-normalStyle : Attribute
-normalStyle =
-  style [ ("backgroundColor", "blue") ]
-        
-selectedStyle : Attribute
-selectedStyle =
-  style [ ("backgroundColor", "red") ]
-
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
@@ -69,14 +61,14 @@ view address model =
       King -> "♔"
       Forbidden -> "X"
     fieldStyle = case model.state of
-      Normal -> normalStyle
-      Selected -> selectedStyle
+      Normal -> ""
+      Selected -> "selected"
     clickAction = case model.state of
       Normal -> Select
       Selected -> Deselect
   in
     td
-      [ fieldStyle
+      [ class fieldStyle
       , onClick address clickAction
       ]
       [ a [] [ text fieldText ] ]
