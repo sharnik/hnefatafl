@@ -35,7 +35,7 @@ port tasks =
 
 type alias ID = Int
 type alias Board = Array (ID, Field.Model)
-type alias Model = {board: Board, moveFrom: (Int, Int)}
+type alias Model = {board: Board, selected: Maybe(Int)}
 
 
 -- Functions
@@ -169,7 +169,7 @@ initialModel =
        , (120, Field.init Field.Empty)
        , (121, Field.init Field.Forbidden)
        ]
-  , moveFrom = (0, 0)
+  , selected = Nothing
   }
 
 init : (Model, Effects Action)
@@ -179,7 +179,7 @@ init =
 
 -- Update
 
-type Action = NoOp | Modify ID Field.Action
+type Action = NoOp | Modify ID Field.Action | Select ID | Deselect ID
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -192,11 +192,39 @@ update action model =
           (fieldID, Field.update fieldAction fieldModel)
         else
           (fieldID, fieldModel)
-      in 
+      in
         ( { model | board = Array.map updateField model.board }
         , Effects.none
         )
 
+    Select id ->
+      case model.selected of
+        Nothing ->
+            let updateField (fieldID, fieldModel) =
+                    if fieldID == id then
+                    (fieldID, Field.update Field.Select fieldModel)
+                    else
+                    (fieldID, fieldModel)
+            in
+                ( { model |
+                            board = Array.map updateField model.board,
+                            selected = Just(id) }
+                , Effects.none
+                )
+        _ -> ( model, Effects.none )
+
+    Deselect id ->
+    let updateField (fieldID, fieldModel) =
+            if fieldID == id then
+            (fieldID, Field.update Field.Deselect fieldModel)
+            else
+            (fieldID, fieldModel)
+    in
+        ( { model |
+                    board = Array.map updateField model.board,
+                    selected = Nothing }
+        , Effects.none
+        )
 
 -- View
 
@@ -216,4 +244,9 @@ drawRow address board count =
 
 drawField : Address Action -> (ID, Field.Model) -> Html
 drawField address (id, fieldModel) =
-  Field.view (Signal.forwardTo address (Modify id)) fieldModel
+  let context = Field.Context
+                (Signal.forwardTo address (Modify id))
+                (Signal.forwardTo address (always (Select id)))
+                (Signal.forwardTo address (always (Deselect id)))
+  in
+      Field.view context fieldModel

@@ -51,8 +51,14 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+type alias Context =
+  { actions : Signal.Address Action
+  , select : Signal.Address ()
+  , deselect : Signal.Address ()
+  }
+
+view : Context -> Model -> Html
+view context model =
   let
     fieldText = case model.content of
       Empty -> ""
@@ -64,11 +70,11 @@ view address model =
       Normal -> ""
       Selected -> "selected"
     clickAction = case model.state of
-      Normal -> Select
-      Selected -> Deselect
+      Normal -> onClick context.select ()
+      Selected -> onClick context.deselect ()
   in
     td
       [ class fieldStyle
-      , onClick address clickAction
+      , clickAction
       ]
       [ a [] [ text fieldText ] ]
