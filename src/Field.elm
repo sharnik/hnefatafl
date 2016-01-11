@@ -72,6 +72,7 @@ view context model =
     clickAction = case model.state of
       Normal -> onClick context.select ()
       Selected -> onClick context.deselect ()
+
   in
     td
       [ class fieldStyle

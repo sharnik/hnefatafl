@@ -202,29 +202,51 @@ update action model =
         Nothing ->
             let updateField (fieldID, fieldModel) =
                     if fieldID == id then
-                    (fieldID, Field.update Field.Select fieldModel)
+                      (fieldID, Field.update Field.Select fieldModel)
                     else
-                    (fieldID, fieldModel)
+                      (fieldID, fieldModel)
             in
                 ( { model |
                             board = Array.map updateField model.board,
                             selected = Just(id) }
                 , Effects.none
                 )
-        _ -> ( model, Effects.none )
+
+        Just(selectedID) ->
+            let
+                updateField (fieldID, fieldModel) =
+                if fieldID == selectedID then
+                    (fieldID, Field.init Field.Empty)
+
+                else if fieldID == id then
+                    case Array.get (selectedID - 1) model.board of
+                      Nothing ->
+                        (fieldID, fieldModel)
+                      Just((_, selectedField)) ->
+                        (fieldID, Field.init selectedField.content)
+
+                else
+                    (fieldID, fieldModel)
+            in
+                ( { model |
+                            board = Array.map updateField model.board,
+                            selected = Nothing }
+            , Effects.none
+            )
 
     Deselect id ->
-    let updateField (fieldID, fieldModel) =
+        let updateField (fieldID, fieldModel) =
             if fieldID == id then
-            (fieldID, Field.update Field.Deselect fieldModel)
+                (fieldID, Field.update Field.Deselect fieldModel)
             else
-            (fieldID, fieldModel)
-    in
-        ( { model |
+                (fieldID, fieldModel)
+        in
+            ( { model |
                     board = Array.map updateField model.board,
                     selected = Nothing }
-        , Effects.none
-        )
+            , Effects.none
+            )
+
 
 -- View
 
