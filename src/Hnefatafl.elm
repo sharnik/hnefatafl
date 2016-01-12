@@ -200,17 +200,20 @@ update action model =
     Select id ->
       case model.selected of
         Nothing ->
-            let updateField (fieldID, fieldModel) =
-                    if fieldID == id then
-                      (fieldID, Field.update Field.Select fieldModel)
-                    else
-                      (fieldID, fieldModel)
-            in
-                ( { model |
-                            board = Array.map updateField model.board,
-                            selected = Just(id) }
-                , Effects.none
-                )
+          case Array.get (id - 1) model.board of
+               Nothing ->
+                 (model, Effects.none)
+               Just((_, selectedField)) ->
+                 if Field.isMovable selectedField then
+                   let updatedBoard =
+                         Array.set (id - 1) (id, Field.update Field.Select selectedField) model.board
+                   in
+                     ( { model |
+                           board = updatedBoard,
+                           selected = Just(id)}
+                     , Effects.none )
+                 else
+                   (model, Effects.none)
 
         Just(selectedID) ->
             let

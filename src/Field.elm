@@ -17,6 +17,15 @@ init content =
   { content = content
   , state = Normal }
 
+isMovable : Model -> Bool
+isMovable model =
+  case model.content of
+    Empty ->
+      False
+    Forbidden ->
+      False
+    _ ->
+      True
 
 -- Update
 
